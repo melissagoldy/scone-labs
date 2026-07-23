@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Total_Protein__c</fullName>
+    <label>Total Protein</label>
+    <summarizedField>Meal_Item__c.Protein__c</summarizedField>
+    <summaryForeignKey>Meal_Item__c.Meal__c</summaryForeignKey>
+    <summaryOperation>sum</summaryOperation>
+    <type>Summary</type>
+</CustomField>
