@@ -1,0 +1,47 @@
+<template>
+    <section class="recipe-build-card">
+        <div class="header-row">
+            <div>
+                <div class="eyebrow">Recipe Build</div>
+                <h2>Ingredients</h2>
+            </div>
+
+            <div class="count">
+                {ingredientCount} items
+            </div>
+        </div>
+
+        <template if:true={ingredients}>
+            <div class="ingredient-grid">
+                <template for:each={ingredients} for:item="ingredient">
+                    <article
+                        key={ingredient.id}
+                        class="ingredient-card clickable"
+                        data-id={ingredient.id}
+                        onclick={handleOpenIngredient}
+                    >
+                        <div class="ingredient-name">
+                            {ingredient.ingredientName}
+                        </div>
+
+                        <div class="amount">
+                            {ingredient.displayAmount}
+                        </div>
+
+                        <template if:true={ingredient.notes}>
+                            <div class="notes">
+                                {ingredient.notes}
+                            </div>
+                        </template>
+                    </article>
+                </template>
+            </div>
+        </template>
+
+        <template if:true={hasNoIngredients}>
+            <div class="empty-state">
+                No ingredients found for this recipe.
+            </div>
+        </template>
+    </section>
+</template>

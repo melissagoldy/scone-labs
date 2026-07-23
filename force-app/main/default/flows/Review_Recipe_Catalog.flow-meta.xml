@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>66.0</apiVersion>
+    <assignments>
+        <name>Initialize_Summary</name>
+        <label>Initialize Summary</label>
+        <locationX>176</locationX>
+        <locationY>176</locationY>
+        <assignmentItems>
+            <assignToReference>recipeSummary</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>Summary_Header</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Get_Available_Recipes</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <name>Add_Recipe_To_Summary</name>
+        <label>Add Recipe to Summary</label>
+        <locationX>176</locationX>
+        <locationY>608</locationY>
+        <assignmentItems>
+            <assignToReference>recipeSummary</assignToReference>
+            <operator>Add</operator>
+            <value>
+                <elementReference>Current_Recipe_Line</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>recipeCount</assignToReference>
+            <operator>Add</operator>
+            <value>
+                <numberValue>1.0</numberValue>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Loop_Available_Recipes</targetReference>
+        </connector>
+    </assignments>
+    <decisions>
+        <name>Check_Recipe_Limit</name>
+        <label>Check Recipe Limit</label>
+        <locationX>176</locationX>
+        <locationY>500</locationY>
+        <defaultConnectorLabel>Limit Reached</defaultConnectorLabel>
+        <rules>
+            <name>Include_Recipe</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>recipeCount</leftValueReference>
+                <operator>LessThan</operator>
+                <rightValue>
+                    <numberValue>10.0</numberValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Add_Recipe_To_Summary</targetReference>
+            </connector>
+            <label>Include Recipe</label>
+        </rules>
+    </decisions>
+    <description>Returns an Agentforce-friendly summary of the current user&apos;s non-retired Salesforce recipe catalog and per-serving nutrition data.</description>
+    <formulas>
+        <name>Summary_Header</name>
+        <dataType>String</dataType>
+        <expression>&quot;Available recipes and recorded nutrition from Salesforce:&quot; &amp; BR()</expression>
+    </formulas>
+    <formulas>
+        <name>Current_Recipe_Line</name>
+        <dataType>String</dataType>
+        <expression>&quot;- &quot; &amp; {!Loop_Available_Recipes.Name} &amp;
+&quot; | Status: &quot; &amp; BLANKVALUE(TEXT({!Loop_Available_Recipes.Keeper_Status__c}), &quot;Not recorded&quot;) &amp;
+&quot; | Hall of Fame: &quot; &amp; IF({!Loop_Available_Recipes.Hall_of_Fame__c}, &quot;Yes&quot;, &quot;No&quot;) &amp;
+&quot; | Servings: &quot; &amp; IF(ISBLANK({!Loop_Available_Recipes.Servings__c}), &quot;Not recorded&quot;, TEXT({!Loop_Available_Recipes.Servings__c})) &amp;
+&quot; | Per serving: &quot; &amp;
+IF(ISBLANK({!Loop_Available_Recipes.Calories_Per_Serving__c}), &quot;Calories not recorded&quot;, TEXT({!Loop_Available_Recipes.Calories_Per_Serving__c}) &amp; &quot; calories&quot;) &amp;
+&quot;, &quot; &amp; IF(ISBLANK({!Loop_Available_Recipes.Protein_Per_Serving__c}), &quot;protein not recorded&quot;, TEXT({!Loop_Available_Recipes.Protein_Per_Serving__c}) &amp; &quot;g protein&quot;) &amp;
+&quot;, &quot; &amp; IF(ISBLANK({!Loop_Available_Recipes.Carbs_Per_Serving__c}), &quot;carbs not recorded&quot;, TEXT({!Loop_Available_Recipes.Carbs_Per_Serving__c}) &amp; &quot;g carbs&quot;) &amp;
+&quot;, &quot; &amp; IF(ISBLANK({!Loop_Available_Recipes.Fat_Per_Serving__c}), &quot;fat not recorded&quot;, TEXT({!Loop_Available_Recipes.Fat_Per_Serving__c}) &amp; &quot;g fat&quot;) &amp;
+&quot;, &quot; &amp; IF(ISBLANK({!Loop_Available_Recipes.Fiber_Per_Serving__c}), &quot;fiber not recorded&quot;, TEXT({!Loop_Available_Recipes.Fiber_Per_Serving__c}) &amp; &quot;g fiber&quot;) &amp;
+IF(ISBLANK({!Loop_Available_Recipes.Recipe_Tagline__c}), &quot;&quot;, &quot; | Tagline: &quot; &amp; {!Loop_Available_Recipes.Recipe_Tagline__c}) &amp;
+BR()</expression>
+    </formulas>
+    <interviewLabel>Review Recipe Catalog {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Review Recipe Catalog</label>
+    <loops>
+        <name>Loop_Available_Recipes</name>
+        <label>Loop Available Recipes</label>
+        <locationX>176</locationX>
+        <locationY>392</locationY>
+        <collectionReference>Get_Available_Recipes</collectionReference>
+        <iterationOrder>Asc</iterationOrder>
+        <nextValueConnector>
+            <targetReference>Check_Recipe_Limit</targetReference>
+        </nextValueConnector>
+    </loops>
+    <processType>AutoLaunchedFlow</processType>
+    <recordLookups>
+        <name>Get_Available_Recipes</name>
+        <label>Get Available Recipes</label>
+        <locationX>176</locationX>
+        <locationY>284</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Loop_Available_Recipes</targetReference>
+        </connector>
+        <filterLogic>1 AND 2</filterLogic>
+        <filters>
+            <field>OwnerId</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$User.Id</elementReference>
+            </value>
+        </filters>
+        <filters>
+            <field>Keeper_Status__c</field>
+            <operator>NotEqualTo</operator>
+            <value>
+                <stringValue>Retired</stringValue>
+            </value>
+        </filters>
+        <getFirstRecordOnly>false</getFirstRecordOnly>
+        <object>Recipe__c</object>
+        <sortField>Name</sortField>
+        <sortOrder>Asc</sortOrder>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <start>
+        <locationX>50</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Initialize_Summary</targetReference>
+        </connector>
+    </start>
+    <status>Active</status>
+    <variables>
+        <name>recipeCount</name>
+        <dataType>Number</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+        <scale>0</scale>
+        <value>
+            <numberValue>0.0</numberValue>
+        </value>
+    </variables>
+    <variables>
+        <name>recipeSummary</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>true</isOutput>
+    </variables>
+    <variables>
+        <name>requestContext</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>true</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+</Flow>
