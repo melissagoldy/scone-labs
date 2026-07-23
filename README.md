@@ -251,4 +251,4 @@ sf project deploy start --source-dir force-app --target-org scone-labs --test-le
 
 Salesforce Administrator and System Analyst building practical Salesforce solutions with automation, custom development, data modeling, and Agentforce.
 
-Occasionally supervised by a highly classified squirrel.
+Occasionally supervised by a highly classified 🐕.
