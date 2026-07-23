@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>66.0</apiVersion>
+
+    <assignments>
+        <name>Set_Recipe_Nutrition</name>
+        <label>Set Recipe Nutrition</label>
+        <locationX>176</locationX>
+        <locationY>360</locationY>
+
+        <assignmentItems>
+            <assignToReference>$Record.Item_Name__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>Get_Recipe.Name</elementReference>
+            </value>
+        </assignmentItems>
+
+        <assignmentItems>
+            <assignToReference>$Record.Calories__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>Calculated_Calories</elementReference>
+            </value>
+        </assignmentItems>
+
+        <assignmentItems>
+            <assignToReference>$Record.Protein__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>Calculated_Protein</elementReference>
+            </value>
+        </assignmentItems>
+
+        <assignmentItems>
+            <assignToReference>$Record.Carbs__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>Calculated_Carbs</elementReference>
+            </value>
+        </assignmentItems>
+
+        <assignmentItems>
+            <assignToReference>$Record.Fat__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>Calculated_Fat</elementReference>
+            </value>
+        </assignmentItems>
+
+        <assignmentItems>
+            <assignToReference>$Record.Fiber__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>Calculated_Fiber</elementReference>
+            </value>
+        </assignmentItems>
+    </assignments>
+
+    <description>
+        Calculates Meal Item nutrition from the selected Recipe and serving multiplier before the Meal Item is saved. Manual Meal Items without a Recipe are not changed.
+    </description>
+
+    <formulas>
+        <name>Calculated_Calories</name>
+        <dataType>Number</dataType>
+        <expression>ROUND(BLANKVALUE({!Get_Recipe.Calories_Per_Serving__c}, 0) * BLANKVALUE({!$Record.Serving_Multiplier__c}, 1), 2)</expression>
+        <scale>2</scale>
+    </formulas>
+
+    <formulas>
+        <name>Calculated_Protein</name>
+        <dataType>Number</dataType>
+        <expression>ROUND(BLANKVALUE({!Get_Recipe.Protein_Per_Serving__c}, 0) * BLANKVALUE({!$Record.Serving_Multiplier__c}, 1), 2)</expression>
+        <scale>2</scale>
+    </formulas>
+
+    <formulas>
+        <name>Calculated_Carbs</name>
+        <dataType>Number</dataType>
+        <expression>ROUND(BLANKVALUE({!Get_Recipe.Carbs_Per_Serving__c}, 0) * BLANKVALUE({!$Record.Serving_Multiplier__c}, 1), 2)</expression>
+        <scale>2</scale>
+    </formulas>
+
+    <formulas>
+        <name>Calculated_Fat</name>
+        <dataType>Number</dataType>
+        <expression>ROUND(BLANKVALUE({!Get_Recipe.Fat_Per_Serving__c}, 0) * BLANKVALUE({!$Record.Serving_Multiplier__c}, 1), 2)</expression>
+        <scale>2</scale>
+    </formulas>
+
+    <formulas>
+        <name>Calculated_Fiber</name>
+        <dataType>Number</dataType>
+        <expression>ROUND(BLANKVALUE({!Get_Recipe.Fiber_Per_Serving__c}, 0) * BLANKVALUE({!$Record.Serving_Multiplier__c}, 1), 2)</expression>
+        <scale>2</scale>
+    </formulas>
+
+    <interviewLabel>Calculate Meal Item Nutrition {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Calculate Meal Item Nutrition</label>
+    <processType>AutoLaunchedFlow</processType>
+
+    <recordLookups>
+        <name>Get_Recipe</name>
+        <label>Get Recipe</label>
+        <locationX>176</locationX>
+        <locationY>240</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Set_Recipe_Nutrition</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.Recipe__c</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>Recipe__c</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+
+    <start>
+        <locationX>50</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Get_Recipe</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Recipe__c</field>
+            <operator>IsNull</operator>
+            <value>
+                <booleanValue>false</booleanValue>
+            </value>
+        </filters>
+        <object>Meal_Item__c</object>
+        <recordTriggerType>CreateAndUpdate</recordTriggerType>
+        <triggerType>RecordBeforeSave</triggerType>
+    </start>
+
+    <status>Active</status>
+</Flow>
