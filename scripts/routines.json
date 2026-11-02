@@ -1,0 +1,127 @@
+[
+  [
+    "Upper Body",
+    [
+      [
+        "Dumbbell Chest Press",
+        10,
+        12
+      ],
+      [
+        "One-Arm Dumbbell Row",
+        10,
+        12
+      ],
+      [
+        "Seated Dumbbell Shoulder Press",
+        10,
+        12
+      ],
+      [
+        "Dumbbell Lateral Raise",
+        12,
+        12
+      ],
+      [
+        "Dumbbell Curl",
+        10,
+        12
+      ],
+      [
+        "Seated Overhead Triceps Extension",
+        10,
+        12
+      ]
+    ]
+  ],
+  [
+    "Lower Body",
+    [
+      [
+        "Sit-to-Stand",
+        10,
+        12
+      ],
+      [
+        "Dumbbell Romanian Deadlift (RDL)",
+        10,
+        10
+      ],
+      [
+        "Glute Bridge",
+        12,
+        12
+      ],
+      [
+        "Standing Calf Raise",
+        15,
+        15
+      ],
+      [
+        "Side-Lying Leg Raise",
+        12,
+        12
+      ]
+    ]
+  ],
+  [
+    "Core",
+    [
+      [
+        "Dead Bug",
+        8,
+        8
+      ],
+      [
+        "Bird Dog",
+        8,
+        8
+      ],
+      [
+        "Standing Pallof Press",
+        10,
+        10
+      ],
+      [
+        "Heel Slide",
+        10,
+        10
+      ],
+      [
+        "Standing March",
+        20,
+        20
+      ]
+    ]
+  ],
+  [
+    "Full Body",
+    [
+      [
+        "Goblet Squat to Bench",
+        10,
+        10
+      ],
+      [
+        "Dumbbell Chest Press",
+        10,
+        10
+      ],
+      [
+        "One-Arm Dumbbell Row",
+        10,
+        10
+      ],
+      [
+        "Glute Bridge",
+        12,
+        12
+      ],
+      [
+        "Farmer Carry",
+        0,
+        0
+      ]
+    ]
+  ]
+]

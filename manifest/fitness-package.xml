@@ -1,0 +1,58 @@
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+  <types>
+    <members>FitnessHubController</members>
+    <members>FitnessHubControllerTest</members>
+    <name>ApexClass</name>
+  </types>
+  <types>
+    <members>Scone_Labs</members>
+    <name>CustomApplication</name>
+  </types>
+  <types>
+    <members>Planned_Exercise__c.Is_Timed__c</members>
+    <members>Planned_Exercise__c.Max_Reps__c</members>
+    <members>Planned_Exercise__c.Min_Reps__c</members>
+    <members>Planned_Exercise__c.Rest_Seconds__c</members>
+    <members>Planned_Exercise__c.Target_Seconds__c</members>
+    <members>Planned_Exercise__c.Weight_Basis__c</members>
+    <members>Workout_Exercise__c.Form_Confirmed__c</members>
+    <members>Workout_Exercise__c.Is_Timed__c</members>
+    <members>Workout_Exercise__c.Max_Reps__c</members>
+    <members>Workout_Exercise__c.Min_Reps__c</members>
+    <members>Workout_Exercise__c.Prescription_Snapshot__c</members>
+    <members>Workout_Exercise__c.Rest_Seconds__c</members>
+    <members>Workout_Exercise__c.Target_Seconds__c</members>
+    <members>Workout_Exercise__c.Weight_Basis__c</members>
+    <members>Workout_Session__c.Completed_At__c</members>
+    <members>Workout_Session__c.Elapsed_Seconds__c</members>
+    <members>Workout_Session__c.Started_At__c</members>
+    <members>Workout_Set__c.Duration_Seconds__c</members>
+    <members>Workout_Set__c.Skipped__c</members>
+    <name>CustomField</name>
+  </types>
+  <types>
+    <members>My_Workouts</members>
+    <name>CustomTab</name>
+  </types>
+  <types>
+    <members>Log_Workout</members>
+    <members>Start_Workout</members>
+    <name>Flow</name>
+  </types>
+  <types>
+    <members>Planned_Exercise__c-Planned Exercise Layout</members>
+    <members>Workout_Exercise__c-Workout Exercise Layout</members>
+    <members>Workout_Session__c-Workout Session Layout</members>
+    <members>Workout_Set__c-Workout Set Layout</members>
+    <name>Layout</name>
+  </types>
+  <types>
+    <members>fitnessHub</members>
+    <name>LightningComponentBundle</name>
+  </types>
+  <types>
+    <members>Scone_Fitness_User</members>
+    <name>PermissionSet</name>
+  </types>
+  <version>66.0</version>
+</Package>

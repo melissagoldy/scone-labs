@@ -51,6 +51,7 @@
     <isOmniPinnedViewEnabled>false</isOmniPinnedViewEnabled>
     <label>Scone Labs</label>
     <navType>Standard</navType>
+    <tabs>My_Workouts</tabs>
     <tabs>Ingredient__c</tabs>
     <tabs>Recipe_Ingredient__c</tabs>
     <tabs>Recipe__c</tabs>
