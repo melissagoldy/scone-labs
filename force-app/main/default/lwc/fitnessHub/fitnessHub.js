@@ -11,7 +11,33 @@ export default class FitnessHub extends LightningElement {
     templates = []; recent = []; unfinished = []; exercises = []; session;
     selectedTemplate; selectedIndex = 0; busy = false; error = ''; notice = ''; dirty = false;
     notes = ''; minutes; remaining = 0; timer; deadline;
-    connectedCallback() { this.initialize(); }
+    theme = 'sage'; showOlder = false; scrollTarget;
+    themeOptions = [
+        { label: 'Sage · calm green', value: 'sage' },
+        { label: 'Ocean · blue', value: 'ocean' },
+        { label: 'Plum · warm purple', value: 'plum' },
+        { label: 'Slate · crisp neutral', value: 'slate' }
+    ];
+    connectedCallback() {
+        try { const saved = localStorage.getItem('sconeFitnessTheme'); if (this.themeOptions.some(t => t.value === saved)) this.theme = saved; } catch (e) { /* Theme still works when storage is unavailable. */ }
+        this.initialize();
+    }
+    renderedCallback() {
+        if (!this.scrollTarget) return;
+        const element = this.template.querySelector(this.scrollTarget);
+        this.scrollTarget = null;
+        if (element) element.scrollIntoView({ behavior: 'auto', block: 'start' });
+    }
+    changeTheme(event) {
+        const value = event.detail.value;
+        if (!this.themeOptions.some(t => t.value === value)) return;
+        this.theme = value;
+        try { localStorage.setItem('sconeFitnessTheme', value); } catch (e) { /* In-memory selection remains available. */ }
+    }
+    get visibleUnfinished() { return this.showOlder ? this.unfinished : this.unfinished.slice(0, 3); }
+    get hasOlder() { return this.unfinished.length > 3; }
+    get olderLabel() { return this.showOlder ? 'Show fewer unfinished workouts' : 'Show older unfinished workouts'; }
+    toggleOlder() { this.showOlder = !this.showOlder; }
     disconnectedCallback() { clearInterval(this.timer); }
     @api validate() { return { isValid: !this.dirty, errorMessage: 'Save the exercise before closing this workout.' }; }
     async initialize() {
@@ -34,6 +60,7 @@ export default class FitnessHub extends LightningElement {
         this.minutes = elapsed != null ? Math.round(elapsed / 60) : this.session.Started_At__c ? Math.max(0, Math.round((Date.now() - new Date(this.session.Started_At__c).getTime()) / 60000)) : null;
         this.selectedIndex = Math.max(0, this.exercises.findIndex(e => e.sets.some(s => !this.isLogged(s, e.Is_Timed__c))));
         this.dirty = false;
+        this.scrollTarget = '[data-exercise-anchor]';
     }
     isLogged(s, timed) { return s.Skipped__c || (timed ? s.Duration_Seconds__c > 0 : s.Reps__c > 0); }
     get homeVisible() { return !this.session; }
@@ -50,7 +77,8 @@ export default class FitnessHub extends LightningElement {
     get target() {
         const e = this.current;
         if (!e) return '';
-        const reps = e.Max_Reps__c ? `${e.Min_Reps__c || e.Target_Reps__c || e.Max_Reps__c}–${e.Max_Reps__c} reps` : `${e.Target_Reps__c || 'your prescribed'} reps`;
+        const minimum = e.Min_Reps__c || e.Target_Reps__c || e.Max_Reps__c;
+        const reps = e.Max_Reps__c ? (minimum === e.Max_Reps__c ? `${e.Max_Reps__c} reps` : `${minimum}–${e.Max_Reps__c} reps`) : `${e.Target_Reps__c || 'your prescribed'} reps`;
         return `${e.Target_Sets__c || e.sets.length} sets · ${e.Is_Timed__c ? `${e.Target_Seconds__c || 'target'} seconds` : reps}`;
     }
     get prescription() { return this.current?.Prescription_Snapshot__c; }
@@ -73,7 +101,7 @@ export default class FitnessHub extends LightningElement {
     get skippedSets() { return this.exercises.reduce((n,e) => n + e.sets.filter(s => s.Skipped__c).length,0); }
     get summaryTitle() { return this.session?.Workout_Template__r?.Name || 'Your workout'; }
     get notesDisabled() { return this.busy || this.completed; }
-    chooseTemplate(event) { this.selectedTemplate = this.templates.find(t => t.Id === event.currentTarget.dataset.id); this.error = ''; }
+    chooseTemplate(event) { this.selectedTemplate = this.templates.find(t => t.Id === event.currentTarget.dataset.id); this.error = ''; this.scrollTarget = '[data-selection-anchor]'; }
     async begin() {
         this.busy = true; this.error = ''; this.notice = '';
         try { const id = await startWorkout({ templateId: this.selectedTemplate.Id }); await this.loadSession(id); }
@@ -112,9 +140,10 @@ export default class FitnessHub extends LightningElement {
         try { await this.persistCurrent(); this.notice = 'Saved to Salesforce. You can return to this workout later.'; }
         catch(e) { this.showError(e); } finally { this.busy = false; }
     }
-    async move(event) { const direction = Number(event.currentTarget.dataset.direction);
+    async move(event) {
+        const direction = Number(event.currentTarget.dataset.direction);
         this.busy = true; this.error = '';
-        try { if (!this.completed) await this.persistCurrent(); this.selectedIndex += direction; this.notice = ''; }
+        try { if (!this.completed) await this.persistCurrent(); this.selectedIndex += direction; this.notice = ''; this.scrollTarget = '[data-exercise-anchor]'; }
         catch(e) { this.showError(e); } finally { this.busy = false; }
     }
     async finish() {

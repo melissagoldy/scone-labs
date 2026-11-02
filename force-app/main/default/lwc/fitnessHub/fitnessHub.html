@@ -1,22 +1,31 @@
 <template>
-    <section class="hub" aria-label="Scone Labs fitness">
-        <header class="hero"><div><span class="eyebrow">SCONE LABS · MOVE WITH PURPOSE</span><h1>Small steps. Stronger you.</h1><p>Your pace. Your progress. One good set at a time.</p></div><span class="hero-icon" aria-hidden="true">✦</span></header>
+    <section class="hub" data-theme={theme} aria-label="Scone Labs fitness">
+        <template lwc:if={homeVisible}>
+            <div class="home-top"><span class="eyebrow">YOUR WORKOUT SPACE</span><lightning-combobox class="theme-select" label="Color theme" value={theme} options={themeOptions} onchange={changeTheme}></lightning-combobox></div>
+        <header class="hero"><div><span class="eyebrow">SCONE LABS · MOVE WITH PURPOSE</span><h1>Show up. Build strength.</h1><p>Put in the work. Track your progress.</p></div><svg class="hero-icon" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><path d="M22 32h20M10 24v16M18 18v28M46 18v28M54 24v16" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round"></path></svg></header>
+        </template>
+        <template lwc:else>
+            <header class="workout-context" data-exercise-anchor tabindex="-1">
+                <div class="context-top"><lightning-button label="Workout home" onclick={goHome} disabled={homeDisabled}></lightning-button><span>{summaryTitle} · {progressText}</span><lightning-combobox class="theme-select" label="Color theme" variant="label-hidden" value={theme} options={themeOptions} onchange={changeTheme}></lightning-combobox></div>
+                <div class="context-main"><div><h1>{currentName}</h1><p>{target}</p></div><div class="context-navigation"><lightning-button label="Previous" data-direction="-1" onclick={move} disabled={previousDisabled}></lightning-button><lightning-button variant="brand" label="Next" data-direction="1" onclick={move} disabled={nextDisabled}></lightning-button></div></div>
+                <lightning-progress-bar value={progressValue} size="small"></lightning-progress-bar>
+            </header>
+        </template>
         <template lwc:if={busy}><lightning-spinner alternative-text="Loading or saving workout" size="small"></lightning-spinner></template>
         <template lwc:if={error}><div class="message error" role="alert">{error}</div></template>
         <template lwc:if={notice}><div class="message success" role="status">{notice}</div></template>
         <template lwc:if={homeVisible}>
-            <template lwc:if={hasUnfinished}><section class="panel"><span class="eyebrow">PICK UP WHERE YOU LEFT OFF</span><h2>Ready to return?</h2><div class="cards"><template for:each={unfinished} for:item="s"><button class="routine resume" key={s.Id} data-id={s.Id} onclick={openSession} disabled={busy}><strong>{s.title}</strong><span>{s.subtitle}</span><span class="link-label">Resume workout →</span></button></template></div></section></template>
-            <section class="panel"><span class="eyebrow">TODAY IS A GOOD DAY TO START</span><h2>Choose your workout</h2><div class="cards"><template for:each={templates} for:item="t"><button key={t.Id} class="routine" data-id={t.Id} onclick={chooseTemplate} disabled={busy}><strong>{t.Name}</strong><span>{t.description}</span><span class="link-label">View routine →</span></button></template></div>
-                <template lwc:if={templateSelected}><div class="selection"><h3>{selectedTemplate.Name}</h3><p>{selectedTemplate.description}</p><lightning-button variant="brand" label="Start or resume this workout" onclick={begin} disabled={busy}></lightning-button></div></template>
+            <template lwc:if={hasUnfinished}><section class="panel"><span class="eyebrow">PICK UP WHERE YOU LEFT OFF</span><h2>Ready to return?</h2><div class="cards"><template for:each={visibleUnfinished} for:item="s"><button class="routine resume" key={s.Id} data-id={s.Id} onclick={openSession} disabled={busy}><strong>{s.title}</strong><span>{s.subtitle}</span><span class="link-label">Resume workout →</span></button></template></div><template lwc:if={hasOlder}><div class="older-toggle"><lightning-button label={olderLabel} onclick={toggleOlder}></lightning-button></div></template></section></template>
+            <section class="panel"><span class="eyebrow">TODAY IS A GOOD DAY TO START</span><h2>Choose your workout</h2><template lwc:if={templateSelected}><div class="selection" data-selection-anchor><h3>{selectedTemplate.Name}</h3><p>{selectedTemplate.description}</p><lightning-button variant="brand" label="Start or resume this workout" onclick={begin} disabled={busy}></lightning-button></div></template><div class="cards"><template for:each={templates} for:item="t"><button key={t.Id} class="routine" data-id={t.Id} onclick={chooseTemplate} disabled={busy}><strong>{t.Name}</strong><span>{t.description}</span><span class="link-label">View routine →</span></button></template></div>
+                
             </section>
             <template lwc:if={hasRecent}><section class="panel"><span class="eyebrow">CONSISTENCY ADDS UP</span><h2>Recent workouts</h2><div class="history"><template for:each={recent} for:item="s"><button key={s.Id} class="history-row" data-id={s.Id} onclick={openSession} disabled={busy}><strong>{s.title}</strong><span>{s.subtitle}</span></button></template></div></section></template>
         </template>
         <template lwc:else>
-            <div class="toolbar"><lightning-button label="Workout home" onclick={goHome} disabled={homeDisabled}></lightning-button><span>{summaryTitle}</span></div>
             <template lwc:if={completed}><section class="celebrate"><span class="eyebrow">YOU SHOWED UP</span><h2>Workout complete ✦</h2><p>{completedSets} sets performed · {skippedSets} sets skipped</p><p>Review your saved performance below.</p></section></template>
             <template lwc:if={hasCurrent}>
                 <section class="panel"><div class="progress"><span>{progressText}</span><span>{session.Workout_Date__c}</span></div><lightning-progress-bar value={progressValue} size="small"></lightning-progress-bar>
-                    <h2 class="exercise-name">{currentName}</h2><div class="target">{target}</div><p>{prescription}</p><p class="muted">Weight: {weightBasis}</p>
+                    <p>{prescription}</p><p class="muted">Weight: {weightBasis}</p>
                     <template lwc:if={formNotes}><details><summary>Form tips</summary><p>{formNotes}</p></details></template><template lwc:if={videoUrl}><a href={videoUrl} target="_blank" rel="noopener noreferrer">Open exercise tutorial ↗</a></template>
                     <div class="previous"><div><span class="eyebrow">LAST TIME</span><template lwc:if={hasPrevious}><p>{previousDate}</p><template for:each={previousRows} for:item="p"><p key={p.Id}>{p.text}</p></template><p class="muted">{bestLabel}</p></template><template lwc:else><p>A fresh starting point. No comparable completed sets yet.</p></template></div>
                         <template lwc:if={hasPrevious}><template lwc:if={completed}></template><template lwc:else><lightning-button label="Use previous weights" onclick={copyWeights} disabled={busy}></lightning-button></template></template>
@@ -28,7 +37,7 @@
                     <div class="pager"><lightning-button label="Previous exercise" data-direction="-1" onclick={move} disabled={previousDisabled}></lightning-button><lightning-button label="Next exercise" data-direction="1" onclick={move} disabled={nextDisabled}></lightning-button></div>
                 </section>
             </template>
-            <section class="panel"><h2>Wrap up</h2><p>Every set needs reps or seconds, or an explicit skip. It is fine to finish with skipped sets.</p><lightning-textarea label="Workout notes" value={notes} onchange={changeNotes} disabled={notesDisabled}></lightning-textarea><lightning-input type="number" label="Workout duration (minutes, optional)" min="0" max="1440" step="1" value={minutes} onchange={changeMinutes} disabled={notesDisabled}></lightning-input><p class="muted">The suggested duration includes time away. Adjust it before finishing. Notes and duration save with Save exercise, navigation, or Finish workout.</p><template lwc:if={completed}></template><template lwc:else><lightning-button variant="brand" label="Finish workout" onclick={finish} disabled={busy}></lightning-button></template></section>
+            <section class="panel"><details class="wrap-up"><summary>Workout notes &amp; finish</summary><p>Every set needs reps or seconds, or an explicit skip. It is fine to finish with skipped sets.</p><lightning-textarea label="Workout notes" value={notes} onchange={changeNotes} disabled={notesDisabled}></lightning-textarea><lightning-input type="number" label="Workout duration (minutes, optional)" min="0" max="1440" step="1" value={minutes} onchange={changeMinutes} disabled={notesDisabled}></lightning-input><p class="muted">The suggested duration includes time away. Adjust it before finishing. Notes and duration save with Save exercise, navigation, or Finish workout.</p><template lwc:if={completed}></template><template lwc:else><lightning-button variant="brand" label="Finish workout" onclick={finish} disabled={busy}></lightning-button></template></details></section>
         </template>
     </section>
 </template>
