@@ -112,9 +112,9 @@ export default class FitnessHub extends LightningElement {
         try { await this.persistCurrent(); this.notice = 'Saved to Salesforce. You can return to this workout later.'; }
         catch(e) { this.showError(e); } finally { this.busy = false; }
     }
-    async move(event) {
+    async move(event) { const direction = Number(event.currentTarget.dataset.direction);
         this.busy = true; this.error = '';
-        try { if (!this.completed) await this.persistCurrent(); this.selectedIndex += Number(event.currentTarget.dataset.direction); this.notice = ''; }
+        try { if (!this.completed) await this.persistCurrent(); this.selectedIndex += direction; this.notice = ''; }
         catch(e) { this.showError(e); } finally { this.busy = false; }
     }
     async finish() {
