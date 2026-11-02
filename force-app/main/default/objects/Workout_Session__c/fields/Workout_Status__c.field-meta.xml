@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Workout_Status__c</fullName>
+    <description>Indicates whether the workout session is in progress, completed, or should be excluded from workout history.</description>
+    <inlineHelpText>Use Completed for real finished workouts. Use Canceled/Test for debug or abandoned sessions.</inlineHelpText>
+    <label>Workout Status</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Started</fullName>
+                <default>true</default>
+                <label>Started</label>
+            </value>
+            <value>
+                <fullName>Completed</fullName>
+                <default>false</default>
+                <label>Completed</label>
+            </value>
+            <value>
+                <fullName>Canceled/Test</fullName>
+                <default>false</default>
+                <label>Canceled/Test</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomApplication xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionOverrides>
+        <actionName>View</actionName>
+        <comment>Action override created by Lightning App Builder during activation.</comment>
+        <content>Recipe_Record_Page1</content>
+        <formFactor>Large</formFactor>
+        <skipRecordTypeSelect>false</skipRecordTypeSelect>
+        <type>Flexipage</type>
+        <pageOrSobjectType>Recipe__c</pageOrSobjectType>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>View</actionName>
+        <comment>Action override created by Lightning App Builder during activation.</comment>
+        <content>Recipe_Record_Page1</content>
+        <formFactor>Small</formFactor>
+        <skipRecordTypeSelect>false</skipRecordTypeSelect>
+        <type>Flexipage</type>
+        <pageOrSobjectType>Recipe__c</pageOrSobjectType>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>View</actionName>
+        <comment>Action override created by Lightning App Builder during activation.</comment>
+        <content>Planned_Exercise_Lightning_Page</content>
+        <formFactor>Large</formFactor>
+        <skipRecordTypeSelect>false</skipRecordTypeSelect>
+        <type>Flexipage</type>
+        <pageOrSobjectType>Planned_Exercise__c</pageOrSobjectType>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>View</actionName>
+        <comment>Action override created by Lightning App Builder during activation.</comment>
+        <content>Planned_Exercise_Lightning_Page</content>
+        <formFactor>Small</formFactor>
+        <skipRecordTypeSelect>false</skipRecordTypeSelect>
+        <type>Flexipage</type>
+        <pageOrSobjectType>Planned_Exercise__c</pageOrSobjectType>
+    </actionOverrides>
+    <brand>
+        <headerColor>#4B66B0</headerColor>
+        <logo>ChatGPT_Image_May_30_2026_05_34_33</logo>
+        <logoVersion>1</logoVersion>
+        <shouldOverrideOrgTheme>true</shouldOverrideOrgTheme>
+    </brand>
+    <description>Recipe and meal planning application used to learn Salesforce development, Apex, GitHub, Salesforce CLI, and application architecture while building a real-world nutrition and recipe management platform.</description>
+    <formFactors>Small</formFactors>
+    <formFactors>Large</formFactors>
+    <isNavAutoTempTabsDisabled>false</isNavAutoTempTabsDisabled>
+    <isNavPersonalizationDisabled>false</isNavPersonalizationDisabled>
+    <isNavTabPersistenceDisabled>false</isNavTabPersistenceDisabled>
+    <isOmniPinnedViewEnabled>false</isOmniPinnedViewEnabled>
+    <label>Scone Labs</label>
+    <navType>Standard</navType>
+    <tabs>Ingredient__c</tabs>
+    <tabs>Recipe_Ingredient__c</tabs>
+    <tabs>Recipe__c</tabs>
+    <tabs>Exercise__c</tabs>
+    <tabs>Workout_Session__c</tabs>
+    <tabs>Workout_Exercise__c</tabs>
+    <tabs>Workout_Set__c</tabs>
+    <tabs>Workout_Template__c</tabs>
+    <tabs>Planned_Exercise__c</tabs>
+    <tabs>Meal__c</tabs>
+    <tabs>Meal_Item__c</tabs>
+    <uiType>Lightning</uiType>
+    <utilityBar>Scone_Labs_UtilityBar</utilityBar>
+</CustomApplication>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Workout_Session__c</fullName>
+    <description>Parent workout session that contains this exercise.</description>
+    <inlineHelpText>The workout session this exercise belongs to.</inlineHelpText>
+    <label>Workout Session</label>
+    <referenceTo>Workout_Session__c</referenceTo>
+    <relationshipLabel>Workout Exercises</relationshipLabel>
+    <relationshipName>Workout_Exercises</relationshipName>
+    <relationshipOrder>0</relationshipOrder>
+    <reparentableMasterDetail>false</reparentableMasterDetail>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>MasterDetail</type>
+    <writeRequiresMasterRead>false</writeRequiresMasterRead>
+</CustomField>

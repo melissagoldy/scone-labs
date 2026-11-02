@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Exercise_Rating__c</fullName>
+    <description>User preference rating used to identify exercises that are enjoyable, sustainable, and likely to support long-term adherence.</description>
+    <inlineHelpText>Rate your overall experience performing this exercise.</inlineHelpText>
+    <label>Exercise Rating</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Love It</fullName>
+                <default>false</default>
+                <label>Love It</label>
+            </value>
+            <value>
+                <fullName>Like It</fullName>
+                <default>false</default>
+                <label>Like It</label>
+            </value>
+            <value>
+                <fullName>Neutral</fullName>
+                <default>false</default>
+                <label>Neutral</label>
+            </value>
+            <value>
+                <fullName>Dislike It</fullName>
+                <default>false</default>
+                <label>Dislike It</label>
+            </value>
+            <value>
+                <fullName>Avoid</fullName>
+                <default>false</default>
+                <label>Avoid</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

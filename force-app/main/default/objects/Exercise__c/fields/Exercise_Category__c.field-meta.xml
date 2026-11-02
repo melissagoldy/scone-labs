@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Exercise_Category__c</fullName>
+    <description>Primary movement category used for exercise organization, reporting, and workout template creation.</description>
+    <inlineHelpText>Select the primary category that best describes the exercise.</inlineHelpText>
+    <label>Exercise Category</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Upper Body Push</fullName>
+                <default>false</default>
+                <label>Upper Body Push</label>
+            </value>
+            <value>
+                <fullName>Upper Body Pull</fullName>
+                <default>false</default>
+                <label>Upper Body Pull</label>
+            </value>
+            <value>
+                <fullName>Lower Body</fullName>
+                <default>false</default>
+                <label>Lower Body</label>
+            </value>
+            <value>
+                <fullName>Core</fullName>
+                <default>false</default>
+                <label>Core</label>
+            </value>
+            <value>
+                <fullName>Carry</fullName>
+                <default>false</default>
+                <label>Carry</label>
+            </value>
+            <value>
+                <fullName>Conditioning</fullName>
+                <default>false</default>
+                <label>Conditioning</label>
+            </value>
+            <value>
+                <fullName>Mobility</fullName>
+                <default>false</default>
+                <label>Mobility</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

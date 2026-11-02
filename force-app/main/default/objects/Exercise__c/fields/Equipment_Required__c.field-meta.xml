@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Equipment_Required__c</fullName>
+    <description>Primary equipment required to perform the exercise.</description>
+    <inlineHelpText>Select the primary equipment needed for this exercise.</inlineHelpText>
+    <label>Equipment Required</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Dumbbells</fullName>
+                <default>false</default>
+                <label>Dumbbells</label>
+            </value>
+            <value>
+                <fullName>Barbell</fullName>
+                <default>false</default>
+                <label>Barbell</label>
+            </value>
+            <value>
+                <fullName>Bodyweight</fullName>
+                <default>false</default>
+                <label>Bodyweight</label>
+            </value>
+            <value>
+                <fullName>Bench</fullName>
+                <default>false</default>
+                <label>Bench</label>
+            </value>
+            <value>
+                <fullName>TRX</fullName>
+                <default>false</default>
+                <label>TRX</label>
+            </value>
+            <value>
+                <fullName>Resistance Bands</fullName>
+                <default>false</default>
+                <label>Resistance Bands</label>
+            </value>
+            <value>
+                <fullName>Machine</fullName>
+                <default>false</default>
+                <label>Machine</label>
+            </value>
+            <value>
+                <fullName>Kettlebell</fullName>
+                <default>false</default>
+                <label>Kettlebell</label>
+            </value>
+            <value>
+                <fullName>Cardio Equipment</fullName>
+                <default>false</default>
+                <label>Cardio Equipment</label>
+            </value>
+            <value>
+                <fullName>Other</fullName>
+                <default>false</default>
+                <label>Other</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

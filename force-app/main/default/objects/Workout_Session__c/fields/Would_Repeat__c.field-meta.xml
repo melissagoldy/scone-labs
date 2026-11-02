@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Would_Repeat__c</fullName>
+    <defaultValue>true</defaultValue>
+    <description>Indicates whether the athlete would willingly repeat this workout again.</description>
+    <inlineHelpText>Leave checked if this workout felt sustainable and worth repeating.</inlineHelpText>
+    <label>Would Repeat</label>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

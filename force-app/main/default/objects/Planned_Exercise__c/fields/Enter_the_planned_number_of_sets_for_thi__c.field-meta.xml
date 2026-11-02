@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Enter_the_planned_number_of_sets_for_thi__c</fullName>
+    <description>Recommended number of repetitions for each planned set.</description>
+    <externalId>false</externalId>
+    <inlineHelpText>Enter the target repetitions for each set of this exercise.</inlineHelpText>
+    <label>Target Reps</label>
+    <precision>3</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>
