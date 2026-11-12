@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Sides_Per_Set__c</fullName>
+    <defaultValue>1</defaultValue>
+    <description>Number of sides performed per set. Use 2 for exercises performed separately on each side.</description>
+    <label>Sides Per Set</label>
+    <precision>1</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <type>Number</type>
+</CustomField>

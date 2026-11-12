@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Estimated_Workout_Minutes__c</fullName>
+  <label>Estimated Workout Minutes</label>
+  <precision>8</precision>
+  <scale>2</scale>
+  <type>Number</type>
+  <formula>ROUND(BLANKVALUE(Exercise_Duration_Total__c, 0) + IF(OR(ISBLANK(Warmup_Minutes__c), Warmup_Minutes__c = 0), 5, Warmup_Minutes__c) + MAX(0, Planned_Exercise_Count__c - 1), 0)</formula>
+  <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+</CustomField>
