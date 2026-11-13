@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Preserve_Day_Identity</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND(NOT(ISNEW()),OR(ISCHANGED(Activity_Date__c),ISCHANGED(Day_Key__c),ISCHANGED(OwnerId),ISCHANGED(Goal__c)))</errorConditionFormula>
+    <errorMessage>Date, owner, unique key, and original goal are preserved when editing daily totals.</errorMessage>
+</ValidationRule>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Key_Matches_Owner_And_Date</fullName>
+    <active>true</active>
+    <errorConditionFormula>Day_Key__c &lt;&gt; CASESAFEID(OwnerId) &amp; &quot;:&quot; &amp; TEXT(Activity_Date__c)</errorConditionFormula>
+    <errorMessage>Daily key must match the owner and activity date.</errorMessage>
+</ValidationRule>

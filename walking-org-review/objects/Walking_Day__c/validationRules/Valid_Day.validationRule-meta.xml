@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Valid_Day</fullName>
+    <active>true</active>
+    <errorConditionFormula>OR(Activity_Date__c &gt; TODAY(),AND(ISBLANK(Steps__c),ISBLANK(Miles__c)),Steps__c &lt; 0,Steps__c &gt; 200000,Miles__c &lt; 0,Miles__c &gt; 200,Minutes__c &lt; 0,Minutes__c &gt; 1440)</errorConditionFormula>
+    <errorMessage>Use a past or current date and nonnegative totals within the supported ranges.</errorMessage>
+</ValidationRule>

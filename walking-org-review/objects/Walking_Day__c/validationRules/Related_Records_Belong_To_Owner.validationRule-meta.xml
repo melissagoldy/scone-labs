@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Related_Records_Belong_To_Owner</fullName>
+    <active>true</active>
+    <errorConditionFormula>OR(AND(NOT(ISBLANK(Goal__c)),Goal__r.OwnerId &lt;&gt; OwnerId),AND(NOT(ISBLANK(Route__c)),Route__r.OwnerId &lt;&gt; OwnerId))</errorConditionFormula>
+    <errorMessage>Walking goals and routes must belong to the owner of the daily record.</errorMessage>
+</ValidationRule>
