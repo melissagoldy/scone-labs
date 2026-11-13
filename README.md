@@ -1,18 +1,21 @@
+
 # Scone Labs Wellness Platform
 
-A Salesforce portfolio project combining workout tracking, recipe management, nutrition analysis, meal planning, automation, Lightning Web Components, Apex, Flow, and Agentforce.
+A Salesforce portfolio project combining workout tracking, walking and step tracking, recipe management, nutrition analysis, meal planning, automation, Lightning Web Components, Apex, Flow, and Agentforce.
 
 Because wellness data deserves better than fourteen browser tabs and a spreadsheet named `FINAL_final_v3.xlsx`.
 
 ## Project Overview
 
-Scone Labs is a custom Salesforce wellness platform designed to organize personal fitness and nutrition data in one connected system.
+Scone Labs is a custom Salesforce wellness platform designed to organize personal fitness, walking, and nutrition data in one connected system.
 
-The platform supports:
+The platform supports or is being developed to support:
 
 - Workout templates, sessions, exercises, and sets
 - Recipe ingredients and calculated nutrition
 - Meal and meal-item tracking
+- Walking activity, daily steps, goals, and routes
+- Progressive Walking and Fitness Hub components
 - Agentforce-powered workout insights
 - Agentforce-powered recipe recommendations
 - Grounded AI responses based on Salesforce records
@@ -29,6 +32,8 @@ Wellness information is often scattered across spreadsheets, notes, fitness apps
 - Calculate per-serving nutrition
 - Compare recipes using recorded nutrition data
 - Record meals and individual meal items
+- Track daily walking activity and steps as development progresses
+- Monitor walking goals and routes as development progresses
 - Ask natural-language questions about Salesforce data
 
 ## Agentforce Capabilities
@@ -79,6 +84,8 @@ The workout data model includes:
 
 This structure supports reusable workout templates, completed sessions, ordered exercises, and individual set performance.
 
+Additional development includes workout duration fields, exercise timing, rest periods, repetition ranges, and related permission-set updates.
+
 ### Recipe and Nutrition Management
 
 The recipe data model includes:
@@ -96,7 +103,42 @@ The meal data model includes:
 - `Meal__c`
 - `Meal_Item__c`
 
-Meal Items can reference a Recipe or represent a manually entered food item. Planned enhancements will calculate and roll up calories, protein, carbohydrates, fat, and fiber to the parent Meal.
+Meal Items can reference a Recipe or represent a manually entered food item.
+
+Planned enhancements will calculate and roll up calories, protein, carbohydrates, fat, and fiber to the parent Meal.
+
+Development also includes improvements to Meal and Meal Item page layouts and related lists.
+
+### Walking and Step Tracking
+
+The walking data model under development includes:
+
+- `Walking_Day__c`
+- `Walking_Goal__c`
+- `Walking_Route__c`
+
+The walking implementation includes metadata for:
+
+- Daily step counts
+- Walking distance and duration
+- Walking dates and activity records
+- Step and mileage goals
+- Walking routes
+- Activity notes
+- Comfort, fatigue, recovery, and other walking feedback
+- Data validation and record relationships
+
+The walking development snapshot also includes:
+
+- `progressiveWalking` Lightning Web Component
+- `walkingMath.js` JavaScript utility
+- `WalkingController` Apex controller
+- `WalkingControllerTest` Apex test class
+- `Scone_Walking_User` permission set
+
+The walking components and metadata are preserved in `walking-org-review/` for continued development.
+
+These files have been committed to GitHub but have not yet been verified as fully integrated, tested, or deployed within the standard Salesforce DX application structure.
 
 ## Automation
 
@@ -115,6 +157,14 @@ Meal Items can reference a Recipe or represent a manually entered food item. Pla
 - Returns recipe status, serving information, and per-serving nutrition
 - Provides grounded recipe data to Agentforce
 
+#### Meal Nutrition Automation
+
+Development includes the `Calculate_Meal_Item_Nutrition` Flow.
+
+The goal is to support nutrition calculations for Meal Items and improve the accuracy of recorded meal totals.
+
+This functionality remains in progress.
+
 ### Apex
 
 The project includes Apex services for:
@@ -125,14 +175,29 @@ The project includes Apex services for:
 - Saving workout exercise sets
 - Recipe ingredient automation
 
+Walking development also includes:
+
+- `WalkingController`
+- `WalkingControllerTest`
+
+The walking Apex implementation remains subject to integration and testing.
+
 ### Lightning Web Components
 
 The project includes custom Lightning Web Components for:
 
 - Displaying recipe ingredients
 - Presenting recipe nutrition information
+- Fitness Hub user interface
+- Progressive Walking and step tracking (in development)
 
-Jest test files are included for the Lightning Web Components.
+The walking development snapshot includes:
+
+- `fitnessHub`
+- `progressiveWalking`
+- `walkingMath.js`
+
+Jest test files are included for Lightning Web Components within the project. Additional walking component testing remains in progress.
 
 ## Technologies Demonstrated
 
@@ -151,6 +216,9 @@ Jest test files are included for the Lightning Web Components.
 - Git and GitHub
 - SOQL
 - Custom objects and relationships
+- Permission sets
+- Validation rules
+- Salesforce page layouts and Lightning record pages
 
 ## Responsible AI Design
 
@@ -166,7 +234,7 @@ The Agentforce implementation follows several grounding and safety principles:
 
 ## Current Development Status
 
-### Completed
+### Completed or Preserved in Source Control
 
 - Custom workout and recipe data models
 - Apex recipe and workout services
@@ -175,8 +243,13 @@ The Agentforce implementation follows several grounding and safety principles:
 - Agentforce recipe recommendation action
 - Grounded Agentforce responses
 - Meal and Meal Item base objects
+- Workout duration and exercise configuration metadata
+- Scone Labs custom tabs and Lightning page metadata
+- Selected custom object page layouts
+- Walking and step-tracking development snapshot
 - Salesforce DX source-control setup
 - GitHub repository integration
+- Development notes and checkpoints
 
 ### In Progress
 
@@ -185,9 +258,13 @@ The Agentforce implementation follows several grounding and safety principles:
 - Meal and Meal Item page-layout improvements
 - Realistic sample Meal records
 - Detailed workout summaries containing exercises and sets
+- Progressive Walking component integration
+- Daily step logging and walking-goal functionality
+- Walking Apex controller and test validation
+- Fitness Hub integration with walking features
 - Additional automated tests
 - Portfolio screenshots and demonstration materials
-- Retrieval of remaining application metadata into source control
+- Retrieval and review of remaining application metadata in source control
 
 ## Planned Enhancements
 
@@ -198,17 +275,52 @@ The Agentforce implementation follows several grounding and safety principles:
 5. Add additional Agentforce actions for meal and nutrition analysis.
 6. Expand Apex and Flow test coverage.
 7. Add architecture diagrams, screenshots, and a recorded demonstration.
+8. Integrate the Progressive Walking component into Fitness Hub.
+9. Validate walking records, goals, routes, and step calculations.
+10. Complete walking component testing and deployment preparation.
+11. Expand the wellness experience to include walking progress alongside workout and nutrition information.
 
 ## Repository Structure
 
 ```text
-force-app/main/default/
-├── classes/       Apex services and controllers
-├── flows/         Agentforce-ready Salesforce Flows
-├── lwc/           Lightning Web Components
-├── objects/       Custom object and field metadata
-└── triggers/      Apex triggers
+scone-labs/
+|
+|-- force-app/
+|   |-- main/
+|       |-- default/
+|           |-- classes/        Apex services and controllers
+|           |-- flows/          Salesforce Flows
+|           |-- lwc/            Lightning Web Components
+|           |-- objects/        Custom objects and fields
+|           |-- layouts/        Salesforce page layouts
+|           |-- flexipages/     Lightning pages
+|           |-- permissionsets/ Permission sets
+|           |-- tabs/           Custom object tabs
+|           |-- triggers/       Apex triggers
+|
+|-- walking-org-review/         Preserved walking development snapshot
+|   |-- classes/                Walking Apex controller and tests
+|   |-- lwc/                    Fitness Hub and Progressive Walking
+|   |-- objects/                Walking objects, fields, validation rules
+|   |-- permissionsets/         Walking permissions
+|
+|-- docs/
+|   |-- fitness-development-notes.md
+|
+|-- README.md
 ```
+
+### Development Snapshots
+
+The `walking-org-review/` directory contains a preserved development snapshot of walking-related Apex, Lightning Web Components, custom objects, fields, validation rules, and permissions.
+
+This directory is maintained as a reference while walking features are integrated into the standard Salesforce DX project structure.
+
+The snapshot is not intended to be deployed directly as part of the main `force-app` source directory.
+
+The `docs/fitness-development-notes.md` file contains additional development notes and checkpoints.
+
+Other local review packages and backup archives may exist outside Git source control.
 
 ## Local Development
 
@@ -244,6 +356,8 @@ sf project deploy start --source-dir force-app --target-org scone-labs --dry-run
 ```powershell
 sf project deploy start --source-dir force-app --target-org scone-labs --test-level NoTestRun --wait 30
 ```
+
+**Note:** Deployment commands target the main Salesforce DX source directory. Walking development files stored in `walking-org-review/` require integration into the appropriate Salesforce metadata directories before deployment.
 
 ## Author
 
