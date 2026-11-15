@@ -21,11 +21,22 @@ public with sharing class FitnessHubController {
     }
     @AuraEnabled
     public static Id startWorkout(Id templateId) {
+        return createWorkout(templateId, true);
+    }
+
+    @AuraEnabled
+    public static Id startNewWorkout(Id templateId) {
+        return createWorkout(templateId, false);
+    }
+
+    private static Id createWorkout(Id templateId, Boolean reuseToday) {
         // Serialize starts on a template. A repeated tap returns the existing unfinished session.
         List<Workout_Template__c> templates = [SELECT Id FROM Workout_Template__c WHERE Id = :templateId WITH USER_MODE FOR UPDATE];
         if (templates.isEmpty()) throw fail('Choose an available workout template.');
-        List<Workout_Session__c> existing = [SELECT Id FROM Workout_Session__c WHERE Workout_Template__c = :templateId AND OwnerId = :UserInfo.getUserId() AND Workout_Status__c = 'Started' WITH USER_MODE ORDER BY CreatedDate DESC LIMIT 1];
-        if (!existing.isEmpty()) return existing[0].Id;
+        if (reuseToday) {
+            List<Workout_Session__c> existing = [SELECT Id FROM Workout_Session__c WHERE Workout_Template__c = :templateId AND OwnerId = :UserInfo.getUserId() AND Workout_Status__c = 'Started' AND Workout_Date__c = :Date.today() WITH USER_MODE ORDER BY CreatedDate DESC LIMIT 1];
+            if (!existing.isEmpty()) return existing[0].Id;
+        }
         List<Planned_Exercise__c> plan = [SELECT Id, Exercise__c, Exercise_Order__c, Target_Sets__c, Enter_the_planned_number_of_sets_for_thi__c, Prescription__c, Min_Reps__c, Max_Reps__c, Is_Timed__c, Target_Seconds__c, Rest_Seconds__c, Weight_Basis__c FROM Planned_Exercise__c WHERE Workout_Template__c = :templateId WITH USER_MODE ORDER BY Exercise_Order__c, CreatedDate LIMIT 31];
         if (plan.isEmpty() || plan.size() > 30) throw fail('A template needs between 1 and 30 exercises.');
         for (Planned_Exercise__c p : plan) {
@@ -83,8 +94,19 @@ public with sharing class FitnessHubController {
     }
     @AuraEnabled
     public static void saveExercise(Id sessionId, Id workoutExerciseId, String setsJson, Boolean formConfirmed) {
+        saveExerciseInternal(sessionId, workoutExerciseId, setsJson, formConfirmed, false);
+    }
+
+    @AuraEnabled
+    public static void correctCompletedExercise(Id sessionId, Id workoutExerciseId, String setsJson, Boolean formConfirmed) {
+        saveExerciseInternal(sessionId, workoutExerciseId, setsJson, formConfirmed, true);
+    }
+
+    private static void saveExerciseInternal(Id sessionId, Id workoutExerciseId, String setsJson, Boolean formConfirmed, Boolean correction) {
         Workout_Session__c session=ownedSession(sessionId,true);
-        if(session.Workout_Status__c=='Completed')throw fail('Completed workouts are read-only in this logger.');
+        if(session.Workout_Status__c=='Canceled/Test')throw fail('Canceled workouts cannot be edited.');
+        if(correction && session.Workout_Status__c!='Completed')throw fail('Only completed workouts can be corrected.');
+        if(!correction && session.Workout_Status__c!='Started')throw fail('Completed workouts are read-only in this logger.');
         List<Workout_Exercise__c> exercises=[SELECT Id, Is_Timed__c FROM Workout_Exercise__c WHERE Id=:workoutExerciseId AND Workout_Session__c=:sessionId WITH USER_MODE];
         if(exercises.isEmpty())throw fail('Exercise does not belong to this workout.');
         List<Workout_Set__c> submitted;
@@ -111,6 +133,28 @@ public with sharing class FitnessHubController {
         update as user new Workout_Session__c(Id=sessionId,Workout_Notes__c=notes,Elapsed_Seconds__c=elapsedSeconds);
     }
     @AuraEnabled
+    public static void correctCompletedDetails(Id sessionId, String notes, Integer elapsedSeconds) {
+        Workout_Session__c session = ownedSession(sessionId, true);
+
+        if (session.Workout_Status__c != 'Completed') {
+            throw fail('Only completed workouts can be corrected.');
+        }
+
+        if (notes != null && notes.length() > 32768) {
+            throw fail('Workout notes are too long.');
+        }
+
+        if (elapsedSeconds != null && (elapsedSeconds < 0 || elapsedSeconds > 86400)) {
+            throw fail('Duration must be between 0 and 24 hours.');
+        }
+
+        update as user new Workout_Session__c(
+            Id = sessionId,
+            Workout_Notes__c = notes,
+            Elapsed_Seconds__c = elapsedSeconds
+        );
+    }
+    @AuraEnabled
     public static void finishWorkout(Id sessionId, String notes, Integer elapsedSeconds) {
         Workout_Session__c session=ownedSession(sessionId,true);
         if(session.Workout_Status__c=='Completed')return;
@@ -121,7 +165,7 @@ public with sharing class FitnessHubController {
         for(Workout_Set__c s:[SELECT Workout_Exercise__c, Reps__c, Duration_Seconds__c, Skipped__c FROM Workout_Set__c WHERE Workout_Exercise__c IN :byId.keySet() WITH USER_MODE]){
             if(!counts.containsKey(s.Workout_Exercise__c))counts.put(s.Workout_Exercise__c,0);counts.put(s.Workout_Exercise__c,counts.get(s.Workout_Exercise__c)+1);
             Boolean valid=byId.get(s.Workout_Exercise__c).Is_Timed__c?s.Duration_Seconds__c>0:s.Reps__c>0;
-            if(!s.Skipped__c&&!valid)throw fail('Enter reps or seconds for every set, or explicitly skip it.');
+            // Blank sets are allowed when completing a partial workout.
             if(!s.Skipped__c&&valid)performed++;
         }
         for(Workout_Exercise__c e:exercises)if(!counts.containsKey(e.Id)||e.Target_Sets__c==null||counts.get(e.Id)!=e.Target_Sets__c)throw fail('The saved set count does not match the exercise target.');
@@ -129,5 +173,41 @@ public with sharing class FitnessHubController {
         if(notes!=null&&notes.length()>32768)throw fail('Workout notes are too long.');
         if(elapsedSeconds!=null&&(elapsedSeconds<0||elapsedSeconds>86400))throw fail('Duration must be between 0 and 24 hours.');
         update as user new Workout_Session__c(Id=sessionId,Workout_Status__c='Completed',Workout_Notes__c=notes,Completed_At__c=System.now(),Elapsed_Seconds__c=elapsedSeconds);
+    }
+
+    @AuraEnabled
+    public static void cancelWorkout(Id sessionId) {
+        Workout_Session__c session = ownedSession(sessionId, true);
+
+        if (session.Workout_Status__c == 'Completed') {
+            throw fail('Completed workouts cannot be canceled.');
+        }
+
+        if (session.Workout_Status__c == 'Canceled/Test') {
+            return;
+        }
+
+        update as user new Workout_Session__c(
+            Id = sessionId,
+            Workout_Status__c = 'Canceled/Test'
+        );
+    }
+
+    @AuraEnabled
+    public static void updateWorkoutDate(Id sessionId, Date workoutDate) {
+        Workout_Session__c session = ownedSession(sessionId, true);
+
+        if (session.Workout_Status__c == 'Canceled/Test') {
+            throw fail('Canceled workouts cannot be edited.');
+        }
+
+        if (workoutDate == null || workoutDate > Date.today()) {
+            throw fail('Choose a valid workout date that is not in the future.');
+        }
+
+        update as user new Workout_Session__c(
+            Id = sessionId,
+            Workout_Date__c = workoutDate
+        );
     }
 }

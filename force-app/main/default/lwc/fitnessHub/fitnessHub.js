@@ -1,17 +1,22 @@
 import { LightningElement, api } from 'lwc';
 import getHome from '@salesforce/apex/FitnessHubController.getHome';
 import getSession from '@salesforce/apex/FitnessHubController.getSession';
-import startWorkout from '@salesforce/apex/FitnessHubController.startWorkout';
+import startNewWorkout from '@salesforce/apex/FitnessHubController.startNewWorkout';
 import saveExercise from '@salesforce/apex/FitnessHubController.saveExercise';
 import saveDraft from '@salesforce/apex/FitnessHubController.saveDraft';
 import finishWorkout from '@salesforce/apex/FitnessHubController.finishWorkout';
+import cancelWorkout from '@salesforce/apex/FitnessHubController.cancelWorkout';
+import updateWorkoutDate from '@salesforce/apex/FitnessHubController.updateWorkoutDate';
+import correctCompletedExercise from '@salesforce/apex/FitnessHubController.correctCompletedExercise';
+import correctCompletedDetails from '@salesforce/apex/FitnessHubController.correctCompletedDetails';
+import LightningConfirm from 'lightning/confirm';
 export default class FitnessHub extends LightningElement {
     @api templateId;
     @api sessionId;
     templates = []; recent = []; unfinished = []; exercises = []; session;
     selectedTemplate; selectedIndex = 0; busy = false; error = ''; notice = ''; dirty = false;
-    notes = ''; minutes; remaining = 0; timer; deadline;
-    theme = 'sage'; showOlder = false; scrollTarget;
+    notes = ''; workoutDate = ''; minutes; remaining = 0; timer; deadline;
+    theme = 'sage'; showOlder = false; scrollTarget; editingCompleted = false; dateDirty = false;
     themeOptions = [
         { label: 'Sage · calm green', value: 'sage' },
         { label: 'Ocean · blue', value: 'ocean' },
@@ -56,10 +61,13 @@ export default class FitnessHub extends LightningElement {
         this.session = data.session;
         this.exercises = data.exercises.map(e => ({ ...e, sets: e.sets.map(s => ({ ...s })), safeVideo: /^https:\/\//i.test(e.Exercise__r.Video_URL__c || '') ? e.Exercise__r.Video_URL__c : null }));
         this.notes = this.session.Workout_Notes__c || '';
+        this.workoutDate = this.session.Workout_Date__c || '';
+        this.dateDirty = false;
         const elapsed = this.session.Elapsed_Seconds__c;
         this.minutes = elapsed != null ? Math.round(elapsed / 60) : this.session.Started_At__c ? Math.max(0, Math.round((Date.now() - new Date(this.session.Started_At__c).getTime()) / 60000)) : null;
         this.selectedIndex = Math.max(0, this.exercises.findIndex(e => e.sets.some(s => !this.isLogged(s, e.Is_Timed__c))));
         this.dirty = false;
+        this.editingCompleted = false;
         this.scrollTarget = '[data-exercise-anchor]';
     }
     isLogged(s, timed) { return s.Skipped__c || (timed ? s.Duration_Seconds__c > 0 : s.Reps__c > 0); }
@@ -68,6 +76,16 @@ export default class FitnessHub extends LightningElement {
     get hasRecent() { return this.recent.length > 0; }
     get templateSelected() { return Boolean(this.selectedTemplate); }
     get completed() { return this.session?.Workout_Status__c === 'Completed'; }
+    get started() { return this.session?.Workout_Status__c === 'Started'; }
+    get editingAllowed() { return this.started || (this.completed && this.editingCompleted); }
+    get showEditButton() { return this.completed && !this.editingCompleted; }
+    get showSaveCorrections() { return this.completed && this.editingCompleted; }
+
+    enableCompletedEditing() {
+        if (this.busy || !this.completed) return;
+        this.editingCompleted = true;
+        this.notice = 'Editing enabled. Save your corrections when finished.';
+    }
     get current() { return this.exercises[this.selectedIndex]; }
     get hasCurrent() { return Boolean(this.current); }
     get currentName() { return this.current?.Exercise__r.Name; }
@@ -84,7 +102,7 @@ export default class FitnessHub extends LightningElement {
     get prescription() { return this.current?.Prescription_Snapshot__c; }
     get progressText() { return `Exercise ${this.selectedIndex + 1} of ${this.exercises.length}`; }
     get progressValue() { return this.exercises.length ? Math.round((this.selectedIndex + 1) / this.exercises.length * 100) : 0; }
-    get setRows() { return (this.current?.sets || []).map(s => ({ ...s, title: `Set ${s.Set_Number__c}`, disabled: this.busy || s.Skipped__c || this.completed })); }
+    get setRows() { return (this.current?.sets || []).map(s => ({ ...s, title: `Set ${s.Set_Number__c}`, disabled: this.busy || s.Skipped__c || !this.editingAllowed })); }
     get isTimed() { return this.current?.Is_Timed__c; }
     get previousRows() { return (this.current?.previousSets || []).map(s => ({ Id: s.Id, text: `Set ${s.Set_Number__c}: ${s.Weight__c == null ? 'weight unspecified' : s.Weight__c + ' lb'} · ${this.isTimed ? s.Duration_Seconds__c + ' sec' : s.Reps__c + ' reps'}` })); }
     get hasPrevious() { return this.previousRows.length > 0; }
@@ -94,23 +112,52 @@ export default class FitnessHub extends LightningElement {
     get historyLimited() { return this.current?.historyLimited; }
     get previousDisabled() { return this.busy || this.selectedIndex === 0; }
     get nextDisabled() { return this.busy || this.selectedIndex === this.exercises.length - 1; }
-    get homeDisabled() { return this.busy || this.dirty; }
+    get homeDisabled() { return this.busy || this.dirty || this.dateDirty; }
     get savedLabel() { return this.dirty ? 'Unsaved changes. Save before leaving this screen.' : 'Saved entries are available when you return.'; }
     get restLabel() { return this.remaining > 0 ? `${Math.floor(this.remaining / 60)}:${String(this.remaining % 60).padStart(2, '0')}` : 'Ready when you are'; }
     get completedSets() { return this.exercises.reduce((n,e) => n + e.sets.filter(s => !s.Skipped__c && this.isLogged(s,e.Is_Timed__c)).length,0); }
     get skippedSets() { return this.exercises.reduce((n,e) => n + e.sets.filter(s => s.Skipped__c).length,0); }
     get summaryTitle() { return this.session?.Workout_Template__r?.Name || 'Your workout'; }
-    get notesDisabled() { return this.busy || this.completed; }
+    get notesDisabled() { return this.busy || !this.editingAllowed; }
     chooseTemplate(event) { this.selectedTemplate = this.templates.find(t => t.Id === event.currentTarget.dataset.id); this.error = ''; this.scrollTarget = '[data-selection-anchor]'; }
     async begin() {
+        if (this.busy || !this.selectedTemplate) return;
         this.busy = true; this.error = ''; this.notice = '';
-        try { const id = await startWorkout({ templateId: this.selectedTemplate.Id }); await this.loadSession(id); }
+        try { const id = await startNewWorkout({ templateId: this.selectedTemplate.Id }); await this.loadSession(id); }
         catch (e) { this.showError(e); } finally { this.busy = false; }
     }
     async openSession(event) {
         this.busy = true; this.error = ''; this.notice = '';
         try { await this.loadSession(event.currentTarget.dataset.id); }
         catch (e) { this.showError(e); } finally { this.busy = false; }
+    }
+    async cancelSession(event) {
+        if (this.busy || this.dirty) return;
+
+        const sessionId = event.currentTarget.dataset.id;
+        if (!sessionId) return;
+
+        const confirmed = await LightningConfirm.open({
+            label: 'Cancel workout?',
+            message: 'This workout will be removed from your unfinished list. Its saved records will not be deleted.',
+            variant: 'headerless'
+        });
+
+        if (!confirmed || this.busy) return;
+
+        this.busy = true;
+        this.error = '';
+        this.notice = '';
+
+        try {
+            await cancelWorkout({ sessionId });
+            await this.initialize();
+            this.notice = 'Workout canceled. Your saved records were preserved.';
+        } catch (e) {
+            this.showError(e);
+        } finally {
+            this.busy = false;
+        }
     }
     changeSet(event) {
         const { id, field } = event.target.dataset;
@@ -120,6 +167,37 @@ export default class FitnessHub extends LightningElement {
     }
     updateCurrent(patch) { this.exercises = this.exercises.map((e,i) => i === this.selectedIndex ? { ...e, ...patch } : e); }
     changeForm(event) { this.updateCurrent({ Form_Confirmed__c: event.target.checked }); this.dirty = true; }
+    get dateDisabled() {
+        return this.busy || this.dirty || this.session?.Workout_Status__c === 'Canceled/Test';
+    }
+
+    changeWorkoutDate(event) {
+        this.workoutDate = event.target.value;
+        this.notice = '';
+        this.dateDirty = this.workoutDate !== this.session?.Workout_Date__c;
+    }
+
+    async saveWorkoutDate() {
+        if (this.busy || this.dirty || !this.session) return;
+
+        this.busy = true;
+        this.error = '';
+        this.notice = '';
+
+        try {
+            await updateWorkoutDate({
+                sessionId: this.session.Id,
+                workoutDate: this.workoutDate
+            });
+
+            await this.loadSession(this.session.Id);
+            this.notice = 'Workout date updated successfully.';
+        } catch (e) {
+            this.showError(e);
+        } finally {
+            this.busy = false;
+        }
+    }
     changeNotes(event) { this.notes = event.target.value; this.dirty = true; }
     changeMinutes(event) { this.minutes = event.target.value === '' ? null : Number(event.target.value); this.dirty = true; }
     copyWeights() {
@@ -130,9 +208,11 @@ export default class FitnessHub extends LightningElement {
     async persistCurrent() {
         const valid = [...this.template.querySelectorAll('lightning-input')].reduce((ok,input) => { input.reportValidity(); return input.checkValidity() && ok; },true);
         if (!valid) throw new Error('Check the highlighted entries.');
-        await saveExercise({ sessionId: this.session.Id, workoutExerciseId: this.current.Id,
+        const saveSets = this.completed ? correctCompletedExercise : saveExercise;
+        await saveSets({ sessionId: this.session.Id, workoutExerciseId: this.current.Id,
             setsJson: JSON.stringify(this.current.sets.map(s => ({ Id:s.Id, Weight__c:s.Weight__c ?? null, Reps__c:s.Reps__c ?? null, Duration_Seconds__c:s.Duration_Seconds__c ?? null, Skipped__c:s.Skipped__c || false }))), formConfirmed: this.current.Form_Confirmed__c || false });
-        await saveDraft({ sessionId:this.session.Id, notes:this.notes, elapsedSeconds:this.minutes == null ? null : Math.round(this.minutes * 60) });
+        const saveDetails = this.completed ? correctCompletedDetails : saveDraft;
+        await saveDetails({ sessionId:this.session.Id, notes:this.notes, elapsedSeconds:this.minutes == null ? null : Math.round(this.minutes * 60) });
         this.dirty = false;
     }
     async save() {
@@ -143,7 +223,7 @@ export default class FitnessHub extends LightningElement {
     async move(event) {
         const direction = Number(event.currentTarget.dataset.direction);
         this.busy = true; this.error = '';
-        try { if (!this.completed) await this.persistCurrent(); this.selectedIndex += direction; this.notice = ''; this.scrollTarget = '[data-exercise-anchor]'; }
+        try { if (this.editingAllowed) await this.persistCurrent(); this.selectedIndex += direction; this.notice = this.completed && this.editingCompleted ? 'Corrections saved. Continue editing or select Save corrections to finish.' : ''; this.scrollTarget = '[data-exercise-anchor]'; }
         catch(e) { this.showError(e); } finally { this.busy = false; }
     }
     async finish() {
@@ -155,8 +235,27 @@ export default class FitnessHub extends LightningElement {
             await this.loadSession(this.session.Id); this.notice = 'Workout complete. Your effort counts.';
         } catch(e) { this.showError(e); } finally { this.busy = false; }
     }
+    async saveCorrections() {
+        if (this.busy || !this.completed || !this.editingCompleted) return;
+
+        this.busy = true;
+        this.error = '';
+        this.notice = '';
+
+        try {
+            await this.persistCurrent();
+            const exerciseIndex = this.selectedIndex;
+            await this.loadSession(this.session.Id);
+            this.selectedIndex = Math.min(exerciseIndex, this.exercises.length - 1);
+            this.notice = 'Workout corrections saved successfully.';
+        } catch (e) {
+            this.showError(e);
+        } finally {
+            this.busy = false;
+        }
+    }
     async goHome() {
-        if (this.dirty) return;
+        if (this.dirty || this.dateDirty) return;
         clearInterval(this.timer); this.remaining = 0; this.session = null; this.sessionId = null; this.templateId = null; this.selectedTemplate = null; this.exercises = []; this.notice = ''; this.error = ''; await this.initialize();
     }
     startRest() {

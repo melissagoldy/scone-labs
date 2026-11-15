@@ -366,3 +366,32 @@ sf project deploy start --source-dir force-app --target-org scone-labs --test-le
 Salesforce Administrator and System Analyst building practical Salesforce solutions with automation, custom development, data modeling, and Agentforce.
 
 Occasionally supervised by a highly classified 🐕.
+
+## Workout Session Management - November 15, 2026
+
+### Changes
+- Start New Workout creates a fresh session, even when another session exists for the same template.
+- Resume opens a selected unfinished workout.
+- Added client-side protection against accidental double-clicks.
+- Partial workouts can be completed with unused sets left blank.
+- Cancel Workout uses the existing Canceled/Test status and preserves saved records.
+- Added workout date corrections for Started and Completed sessions.
+- Completed workouts open read-only, with an explicit Edit Workout mode.
+- Completed-workout corrections support sets, reps, weights, form confirmation, notes, and duration.
+- Corrections save when navigating between exercises.
+- Save Corrections returns completed workouts to read-only mode.
+- Added tracking for unsaved workout date changes.
+
+### Validation and Deployment
+- Date: November 15, 2026
+- Salesforce org: melissa@sconelabs.dev
+- Apex tests: 12 passed, 0 failed
+- Validation: Succeeded
+- Deployment: Succeeded
+- Deployment ID: 0AfdL00000iO0K5SAK
+
+### Notes
+- Existing workout records were not modified by deployment.
+- Permanent deletion was not implemented. The Scone_Fitness_User permission set does not grant Delete on Workout_Session__c.
+- Browser-based functional testing remains to be completed.
+- Only FitnessHubController, FitnessHubControllerTest, and fitnessHub were deployed.

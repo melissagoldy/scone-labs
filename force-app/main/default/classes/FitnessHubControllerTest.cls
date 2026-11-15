@@ -87,4 +87,270 @@ private class FitnessHubControllerTest {
     
         }
     }
+
+    @IsTest
+    static void startsNewWorkoutWhenPreviousSessionIsOlder() {
+        System.runAs(new User(Id=UserInfo.getUserId())) {
+            Id oldId = start();
+
+            update new Workout_Session__c(
+                Id = oldId,
+                Workout_Date__c = Date.today().addDays(-1)
+            );
+
+            Id newId = start();
+
+            System.assertNotEquals(
+                oldId,
+                newId,
+                'An older unfinished session must not be reused.'
+            );
+
+            System.assertEquals(
+                newId,
+                start(),
+                'Repeated starts on the same day must reuse the session.'
+            );
+
+            System.assertEquals(
+                2,
+                [SELECT COUNT() FROM Workout_Session__c],
+                'Both sessions should remain available.'
+            );
+        }
+    }
+
+    @IsTest
+    static void completesWorkoutWithUnusedBlankSets() {
+        System.runAs(new User(Id = UserInfo.getUserId())) {
+            Id sessionId = start();
+
+            Workout_Exercise__c exercise = [
+                SELECT Id
+                FROM Workout_Exercise__c
+                WHERE Workout_Session__c = :sessionId
+                AND Is_Timed__c = false
+                LIMIT 1
+            ];
+
+            List<Workout_Set__c> sets = [
+                SELECT Id, Reps__c, Weight__c, Skipped__c
+                FROM Workout_Set__c
+                WHERE Workout_Exercise__c = :exercise.Id
+                ORDER BY CreatedDate
+            ];
+
+            sets[0].Reps__c = 10;
+            sets[0].Weight__c = 10;
+
+            FitnessHubController.saveExercise(
+                sessionId,
+                exercise.Id,
+                JSON.serialize(sets),
+                false
+            );
+
+            FitnessHubController.finishWorkout(
+                sessionId,
+                'Completed one set',
+                300
+            );
+
+            System.assertEquals(
+                'Completed',
+                [
+                    SELECT Workout_Status__c
+                    FROM Workout_Session__c
+                    WHERE Id = :sessionId
+                ].Workout_Status__c
+            );
+
+            System.assertEquals(
+                4,
+                [
+                    SELECT COUNT()
+                    FROM Workout_Set__c
+                    WHERE Workout_Exercise__r.Workout_Session__c = :sessionId
+                    AND Reps__c = null
+                    AND Duration_Seconds__c = null
+                    AND Skipped__c = false
+                ],
+                'Unused sets should remain blank, not be marked skipped.'
+            );
+        }
+    }
+
+    @IsTest
+    static void explicitlyStartsTwoWorkoutsOnSameDay() {
+        System.runAs(new User(Id = UserInfo.getUserId())) {
+            Id templateId = [
+                SELECT Id FROM Workout_Template__c LIMIT 1
+            ].Id;
+
+            Id firstId = FitnessHubController.startNewWorkout(templateId);
+            Id secondId = FitnessHubController.startNewWorkout(templateId);
+
+            System.assertNotEquals(
+                firstId,
+                secondId,
+                'Start New must create a separate workout.'
+            );
+
+            System.assertEquals(
+                2,
+                [SELECT COUNT() FROM Workout_Session__c],
+                'Both workouts should be saved.'
+            );
+
+            System.assertEquals(
+                10,
+                [SELECT COUNT() FROM Workout_Set__c],
+                'Each workout should have its own sets.'
+            );
+        }
+    }
+
+    @IsTest
+    static void cancelsUnfinishedWorkoutWithoutDeletingHistory() {
+        System.runAs(new User(Id = UserInfo.getUserId())) {
+            Id sessionId = start();
+
+            FitnessHubController.cancelWorkout(sessionId);
+            FitnessHubController.cancelWorkout(sessionId);
+
+            System.assertEquals(
+                'Canceled/Test',
+                [
+                    SELECT Workout_Status__c
+                    FROM Workout_Session__c
+                    WHERE Id = :sessionId
+                ].Workout_Status__c
+            );
+
+            System.assertEquals(
+                2,
+                [
+                    SELECT COUNT()
+                    FROM Workout_Exercise__c
+                    WHERE Workout_Session__c = :sessionId
+                ]
+            );
+
+            System.assertEquals(
+                5,
+                [
+                    SELECT COUNT()
+                    FROM Workout_Set__c
+                    WHERE Workout_Exercise__r.Workout_Session__c = :sessionId
+                ]
+            );
+
+            Map<String, Object> home = (Map<String, Object>)
+                JSON.deserializeUntyped(FitnessHubController.getHome());
+
+            List<Object> unfinished = (List<Object>) home.get('unfinished');
+
+            System.assertEquals(
+                0,
+                unfinished.size(),
+                'Canceled workout should not appear in unfinished workouts.'
+            );
+        }
+    }
+
+    @IsTest
+    static void updatesWorkoutDateWithValidation() {
+        System.runAs(new User(Id = UserInfo.getUserId())) {
+            Id sessionId = start();
+            Date correctedDate = Date.today().addDays(-2);
+
+            FitnessHubController.updateWorkoutDate(sessionId, correctedDate);
+
+            System.assertEquals(
+                correctedDate,
+                [SELECT Workout_Date__c FROM Workout_Session__c
+                 WHERE Id = :sessionId].Workout_Date__c
+            );
+
+            Boolean rejected = false;
+            try {
+                FitnessHubController.updateWorkoutDate(
+                    sessionId, Date.today().addDays(1)
+                );
+            } catch (AuraHandledException e) {
+                rejected = true;
+            }
+            System.assert(rejected, 'Future dates must be rejected.');
+
+            FitnessHubController.cancelWorkout(sessionId);
+
+            rejected = false;
+            try {
+                FitnessHubController.updateWorkoutDate(
+                    sessionId, Date.today()
+                );
+            } catch (AuraHandledException e) {
+                rejected = true;
+            }
+            System.assert(rejected, 'Canceled workouts must not be edited.');
+        }
+    }
+
+    @IsTest
+    static void correctsCompletedWorkoutWithoutReopeningIt() {
+        System.runAs(new User(Id = UserInfo.getUserId())) {
+            Id sessionId = start();
+            saveAll(sessionId);
+            FitnessHubController.finishWorkout(sessionId, 'Original notes', 600);
+
+            Workout_Exercise__c exercise = [
+                SELECT Id, Form_Confirmed__c
+                FROM Workout_Exercise__c
+                WHERE Workout_Session__c = :sessionId
+                AND Is_Timed__c = false
+                LIMIT 1
+            ];
+
+            List<Workout_Set__c> sets = [
+                SELECT Id, Weight__c, Reps__c, Skipped__c
+                FROM Workout_Set__c
+                WHERE Workout_Exercise__c = :exercise.Id
+            ];
+
+            sets[0].Weight__c = 20;
+            sets[0].Reps__c = 15;
+
+            FitnessHubController.correctCompletedExercise(
+                sessionId,
+                exercise.Id,
+                JSON.serialize(sets),
+                true
+            );
+
+            FitnessHubController.correctCompletedDetails(
+                sessionId,
+                'Corrected workout notes',
+                900
+            );
+
+            Workout_Session__c session = [
+                SELECT Workout_Status__c, Workout_Notes__c, Elapsed_Seconds__c
+                FROM Workout_Session__c
+                WHERE Id = :sessionId
+            ];
+
+            System.assertEquals('Completed', session.Workout_Status__c);
+            System.assertEquals('Corrected workout notes', session.Workout_Notes__c);
+            System.assertEquals(900, session.Elapsed_Seconds__c);
+
+            Workout_Set__c corrected = [
+                SELECT Weight__c, Reps__c
+                FROM Workout_Set__c
+                WHERE Id = :sets[0].Id
+            ];
+
+            System.assertEquals(20, corrected.Weight__c);
+            System.assertEquals(15, corrected.Reps__c);
+        }
+    }
 }
