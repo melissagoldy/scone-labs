@@ -448,3 +448,12 @@ Created two reusable Salesforce workout templates:
 - Baseline and weeks 4, 8, and 12 measurements
 - Strength progression reporting
 
+
+### Workout Template Action Cleanup - November 16, 2026
+
+- Removed the Start Workout quick action from the Workout Template page layout.
+- My Workouts (Fitness Hub) is the preferred interface for starting, resuming, and completing workout sessions.
+- Preserved the underlying quick action and Flow.
+- No existing workout records were modified.
+- Salesforce deployment succeeded: 0AfdL00000iQ9JFSA0.
+
