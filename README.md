@@ -395,3 +395,56 @@ Occasionally supervised by a highly classified 🐕.
 - Permanent deletion was not implemented. The Scone_Fitness_User permission set does not grant Delete on Workout_Session__c.
 - Browser-based functional testing remains to be completed.
 - Only FitnessHubController, FitnessHubControllerTest, and fitnessHub were deployed.
+
+## 12-Week Muscle Recomposition Program
+
+**Program dates:** November 16, 2026 - February 7, 2027
+
+### Workout Templates
+
+Created two reusable Salesforce workout templates:
+
+**12-Week Recomp A**
+- Goblet Squat to Bench: 2 sets, 8-12 reps
+- Dumbbell Chest Press: 2 sets, 8-12 reps
+- One-Arm Dumbbell Row: 2 sets, 10-12 reps per side
+- Dumbbell Romanian Deadlift: 2 sets, 8-12 reps
+- Dead Bug: 2 sets, 8 reps per side
+
+**12-Week Recomp B**
+- Supported Split Squat: 2 sets, 8-10 reps per side
+- Dumbbell Hip Thrust: 2 sets, 10-15 reps
+- Seated Dumbbell Shoulder Press: 2 sets, 8-12 reps
+- TRX Row or Supported Dumbbell Row: 2 sets, 10-12 reps
+- Standing Calf Raise: 2 sets, 12-15 reps
+
+### Training Schedule
+
+- Monday and Wednesday: primary strength workouts
+- Friday: optional third workout initially
+- Alternate Workout A and Workout B
+- Rest: 90 seconds configured per exercise
+- Add a third set gradually during weeks 5-8 if recovery allows
+
+### Salesforce Implementation
+
+- Reused 8 existing Exercise records
+- Created 2 new Exercise records: Supported Split Squat and Dumbbell Hip Thrust
+- Created 2 Workout Template records
+- Created 10 Planned Exercise records
+- Configured exercise order, target sets, rep ranges, and sides per set
+- Verified rerunning the setup did not create duplicate planned exercises
+- Removed an accidental test exercise named G
+
+**Implementation method:** Salesforce CLI data commands.
+
+**Important:** These are Salesforce data records, not source-controlled metadata. README documentation does not back up the records.
+
+### Remaining Work
+
+- 12-week workout schedule and progress dashboard
+- Weekly weight and waist check-ins
+- Protein consistency tracking
+- Baseline and weeks 4, 8, and 12 measurements
+- Strength progression reporting
+
