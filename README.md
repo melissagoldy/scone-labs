@@ -457,3 +457,16 @@ Created two reusable Salesforce workout templates:
 - No existing workout records were modified.
 - Salesforce deployment succeeded: 0AfdL00000iQ9JFSA0.
 
+
+## November 2026: Workout Calendar and Muscle Visuals
+
+- Added a 12-week workout calendar for the recomp program.
+- Added WorkoutCalendarController and its Apex test class.
+- Added navigation from scheduled workouts to My Workouts.
+- Enhanced Fitness Hub with compact muscle-group illustrations.
+- Added sconeMuscleMaps static resource with 10 exercise diagrams.
+- Added exercise tutorial URLs for Workout A and Workout B.
+- Updated Workout B to use Glute Bridge instead of Dumbbell Hip Thrust.
+
+Note: Workout templates, planned exercise records, and tutorial URLs
+are Salesforce data and are not included in this Git commit.

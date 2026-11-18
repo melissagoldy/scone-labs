@@ -54,6 +54,12 @@
                 <section class="panel"><div class="progress"><span>{progressText}</span><span>{session.Workout_Date__c}</span></div><lightning-progress-bar value={progressValue} size="small"></lightning-progress-bar>
                     <p>{prescription}</p><p class="muted">Weight: {weightBasis}</p>
                     <template lwc:if={formNotes}><details><summary>Form tips</summary><p>{formNotes}</p></details></template><template lwc:if={videoUrl}><a href={videoUrl} target="_blank" rel="noopener noreferrer">Open exercise tutorial ↗</a></template>
+                    <template lwc:if={muscleMapUrl}>
+                        <div class="scone-muscle-visual">
+                            <span class="scone-muscle-heading">MUSCLES WORKED</span>
+                            <img class="scone-muscle-map" src={muscleMapUrl} alt={muscleMapAlt} loading="lazy" />
+                        </div>
+                    </template>
                     <div class="previous"><div><span class="eyebrow">LAST TIME</span><template lwc:if={hasPrevious}><p>{previousDate}</p><template for:each={previousRows} for:item="p"><p key={p.Id}>{p.text}</p></template><p class="muted">{bestLabel}</p></template><template lwc:else><p>A fresh starting point. No comparable completed sets yet.</p></template></div>
                         <template lwc:if={hasPrevious}><template lwc:if={completed}></template><template lwc:else><lightning-button label="Use previous weights" onclick={copyWeights} disabled={busy}></lightning-button></template></template>
                     </div>

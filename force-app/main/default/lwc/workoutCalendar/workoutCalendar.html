@@ -1,0 +1,59 @@
+<template>
+    <section class="calendar-shell">
+        <header class="hero">
+            <p class="eyebrow">SCONE LABS · MOVE WITH PURPOSE</p>
+            <h1>12-Week Workout Calendar</h1>
+            <p>November 16, 2026 – February 7, 2027 · Workout A / Workout B</p>
+        </header>
+
+        <div class="toolbar">
+            <lightning-button-icon icon-name="utility:chevronleft" alternative-text="Previous month" onclick={previousMonth} disabled={isFirstMonth}></lightning-button-icon>
+            <h2>{monthLabel}</h2>
+            <lightning-button-icon icon-name="utility:chevronright" alternative-text="Next month" onclick={nextMonth} disabled={isLastMonth}></lightning-button-icon>
+            <lightning-button label="Refresh progress" icon-name="utility:refresh" onclick={handleRefresh} disabled={loading}></lightning-button>
+        </div>
+
+        <div class="legend">
+            <span class="legend-a">A · Full Body A</span>
+            <span class="legend-b">B · Full Body B</span>
+            <span>✓ Completed</span>
+            <span>Friday optional in weeks 1–2</span>
+        </div>
+
+        <template if:true={errorMessage}>
+            <div class="error" role="alert">{errorMessage}</div>
+        </template>
+        <template if:true={loading}>
+            <lightning-spinner alternative-text="Loading workout progress" size="small"></lightning-spinner>
+        </template>
+
+        <div class="calendar-grid" role="table" aria-label="Workout schedule">
+            <template for:each={weekdays} for:item="weekday">
+                <div key={weekday} class="weekday" role="columnheader">{weekday}</div>
+            </template>
+            <template for:each={calendarCells} for:item="cell">
+                <div key={cell.key} class={cell.className} role="cell">
+                    <template if:false={cell.isBlank}>
+                        <span class="number">{cell.day}</span>
+                        <template if:true={cell.isWorkout}>
+                            <span class="workout-name">Workout {cell.workout}</span>
+<a href="/lightning/n/My_Workouts"
+   class="slds-text-link"
+   title="Open My Workouts to start or resume this workout">
+    Open My Workouts
+</a>
+                            <span class="status">{cell.statusLabel}</span>
+                        </template>
+                        <template if:true={cell.otherLogged}>
+                            <span class="extra">Another workout logged ✓</span>
+                        </template>
+                    </template>
+                </div>
+            </template>
+        </div>
+        <footer>
+            <strong>{completedCount} A/B workouts completed</strong>
+            <p>Start, resume, and finish workouts from the <strong>My Workouts</strong> tab. Refresh here to see new checkmarks.</p>
+        </footer>
+    </section>
+</template>

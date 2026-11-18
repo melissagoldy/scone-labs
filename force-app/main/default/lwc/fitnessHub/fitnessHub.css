@@ -2,3 +2,25 @@
 
 /* Compact layout: preserve input sizes while reducing unused space. */
 .hero{padding:18px 24px;align-items:center}.hero h1{font-size:26px}.hero p{margin-top:6px}.hero-icon{width:56px;height:56px;flex-shrink:0}.hero .eyebrow{margin-bottom:5px}.home-top{margin-bottom:8px}.panel{padding:16px;margin-top:10px}.panel h2{margin-bottom:10px}.routine{padding:12px;gap:5px}.routine span:not(.link-label){display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}.selection p{display:block}.context-main{margin:8px 0}.context-main h1{font-size:20px}.context-main p{margin-top:2px}.previous{margin:10px 0;padding:10px 12px}.previous .eyebrow{margin-bottom:3px}.sets{margin:10px 0;gap:6px}.set-card{display:grid;grid-template-columns:52px minmax(0,1fr) 112px;align-items:center;gap:12px;padding:8px 12px}.set-card h3{margin:0;font-size:14px}.set-inputs{margin:0;gap:12px}.save-state{margin:8px 0}.pager{padding-top:10px;margin-top:12px}details{margin:8px 0}.cards{gap:8px}@media(min-width:960px){.cards{grid-template-columns:repeat(3,minmax(0,1fr))}}@media(max-width:600px){.hero{padding:14px}.hero h1{font-size:22px}.panel{padding:12px}.set-card{grid-template-columns:42px minmax(0,1fr);gap:6px 8px;padding:8px}.set-card>lightning-input{grid-column:2}.set-inputs{gap:8px}.context-main h1{font-size:18px}}
+
+/* Compact muscle-focus visual next to exercise form tips/tutorial */
+.scone-muscle-visual {
+    margin: 0.5rem 0 0.65rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+}
+.scone-muscle-heading {
+    font-size: 0.66rem;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    color: #51677a;
+}
+.scone-muscle-map {
+    width: 135px;
+    max-width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 0.375rem;
+}

@@ -1,3 +1,4 @@
+import sconeMuscleMaps from '@salesforce/resourceUrl/sconeMuscleMaps';
 import { LightningElement, api } from 'lwc';
 import getHome from '@salesforce/apex/FitnessHubController.getHome';
 import getSession from '@salesforce/apex/FitnessHubController.getSession';
@@ -91,6 +92,23 @@ export default class FitnessHub extends LightningElement {
     get currentName() { return this.current?.Exercise__r.Name; }
     get formNotes() { return this.current?.Exercise__r.Form_Notes__c; }
     get videoUrl() { return this.current?.safeVideo; }
+    get muscleMapUrl() {
+        const imageByExercise = {
+            'Goblet Squat to Bench': 'gobletSquat',
+            'Dumbbell Chest Press': 'chestPress',
+            'One-Arm Dumbbell Row': 'oneArmRow',
+            'Dumbbell Romanian Deadlift (RDL)': 'rdl',
+            'Dead Bug': 'deadBug',
+            'Sit-to-Stand': 'sitToStand',
+            'Glute Bridge': 'gluteBridge',
+            'Seated Dumbbell Shoulder Press': 'shoulderPress',
+            'TRX Row or Supported Dumbbell Row': 'supportedRow',
+            'Standing Calf Raise': 'calfRaise'
+        };
+        const image = imageByExercise[this.currentName];
+        return image ? `${sconeMuscleMaps}/${image}.png` : null;
+    }
+    get muscleMapAlt() { return `Muscle groups involved in ${this.currentName}`; }
     get weightBasis() { return this.current?.Weight_Basis__c || 'Legacy weight basis is unspecified. Keep your convention consistent.'; }
     get target() {
         const e = this.current;

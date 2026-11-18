@@ -1,0 +1,33 @@
+.calendar-shell { max-width: 1100px; margin: 0 auto; background: #fff; border-radius: 12px; overflow: hidden; color: #153750; border: 1px solid #d9e5ee; }
+.hero { padding: 22px 26px; color: white; background: #173b56; }
+.hero .eyebrow { font-size: .69rem; letter-spacing: .17em; font-weight: 700; margin: 0 0 10px; color: #b5ddeb; }
+.hero h1 { font-size: 1.65rem; font-weight: 700; margin: 0 0 6px; }
+.hero p { margin: 0; font-size: .85rem; }
+.toolbar { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 18px 16px 8px; flex-wrap: wrap; }
+.toolbar h2 { min-width: 180px; text-align: center; font-size: 1.3rem; font-weight: 700; }
+.legend { display: flex; flex-wrap: wrap; gap: 14px; padding: 10px 20px 16px; font-size: .75rem; color: #536777; }
+.legend-a, .legend-b { font-weight: 700; }
+.legend-a { color: #185e94; } .legend-b { color: #6c479b; }
+.calendar-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 5px; padding: 0 14px 18px; }
+.weekday { text-align: center; font-size: .75rem; color: #536777; font-weight: 700; padding: 8px 0; }
+.day { position: relative; min-height: 105px; border-radius: 8px; background: #f7f9fb; padding: 8px; border: 1px solid #e6ebf0; display: flex; flex-direction: column; gap: 5px; }
+.day.blank { background: transparent; border-color: transparent; }
+.day.workout-a { background: #e8f2f9; border-color: #b7d6e9; }
+.day.workout-b { background: #f0eafa; border-color: #d1bce9; }
+.day.completed { box-shadow: inset 0 0 0 2px #328164; }
+.day.today { outline: 2px solid #d39b1d; outline-offset: -2px; }
+.number { font-size: .84rem; font-weight: 700; }
+.workout-name { font-size: .8rem; font-weight: 700; }
+.status { font-size: .7rem; color: #416176; }
+.completed .status { color: #18704e; font-weight: 700; }
+.extra { font-size: .68rem; color: #18704e; }
+.error { padding: 8px 16px; color: #a00; }
+footer { border-top: 1px solid #e4ebf0; padding: 16px 20px 20px; font-size: .86rem; }
+footer p { color: #536777; margin-top: 5px; }
+@media (max-width: 650px) {
+    .hero { padding: 18px; } .hero h1 { font-size: 1.3rem; }
+    .calendar-grid { gap: 3px; padding: 0 5px 12px; }
+    .day { min-height: 82px; padding: 4px; gap: 3px; }
+    .workout-name { font-size: .65rem; } .status, .extra { font-size: .6rem; }
+    .legend { gap: 8px; } .toolbar h2 { min-width: 125px; }
+}
